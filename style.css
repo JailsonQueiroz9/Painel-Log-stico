@@ -1,0 +1,302 @@
+
+:root {
+  /* Default Theme: Light System (Clarity) based on image */
+  --color-primary-400: 96 165 250;
+  --color-primary-500: 59 130 246;
+  --color-primary-600: 37 99 235;
+  --color-primary-900: 30 58 138;
+  
+  /* Background Variable - Branco Azulado para modo light */
+  --color-bg-main: 240 247 255; /* Very light blue-white */
+  --color-text-main: 15 23 42;  /* slate-900 */
+}
+
+.dark {
+  /* Industrial Dark Theme from Image */
+  --color-bg-main: 5 10 20;    /* Dark navy */
+  --color-text-main: 255 255 255; 
+}
+
+.bg-custom-main {
+  background-color: rgb(var(--color-bg-main)) !important;
+}
+
+.text-custom-main {
+  color: rgb(var(--color-text-main)) !important;
+}
+
+.theme-emerald {
+  --color-primary-400: 52 211 153;
+  --color-primary-500: 16 185 129;
+  --color-primary-600: 5 150 105;
+  --color-primary-900: 6 78 59;
+}
+
+.theme-violet {
+  --color-primary-400: 167 139 250;
+  --color-primary-500: 139 92 246;
+  --color-primary-600: 124 58 237;
+  --color-primary-900: 76 29 149;
+}
+
+.theme-rose {
+  --color-primary-400: 251 113 133;
+  --color-primary-500: 244 63 94;
+  --color-primary-600: 225 29 72;
+  --color-primary-900: 136 19 55;
+}
+
+.theme-amber {
+  --color-primary-400: 251 191 36;
+  --color-primary-500: 245 158 11;
+  --color-primary-600: 217 119 6;
+  --color-primary-900: 120 53 15;
+}
+
+/* Gradients Base Colors */
+.theme-ocean {
+  --color-primary-400: 34 211 238; /* Cyan */
+  --color-primary-500: 6 182 212;
+  --color-primary-600: 8 145 178;
+  --color-primary-900: 22 78 99;
+}
+
+.theme-sunset {
+  --color-primary-400: 251 146 60; /* Orange */
+  --color-primary-500: 249 115 22;
+  --color-primary-600: 234 88 12;
+  --color-primary-900: 124 45 18;
+}
+
+.theme-forest {
+  --color-primary-400: 45 212 191; /* Teal */
+  --color-primary-500: 20 184 166;
+  --color-primary-600: 13 148 136;
+  --color-primary-900: 19 78 74;
+}
+
+.theme-nebula {
+  --color-primary-400: 232 121 249; /* Fuchsia */
+  --color-primary-500: 217 70 239;
+  --color-primary-600: 192 38 211;
+  --color-primary-900: 112 26 117;
+}
+
+.theme-midnight {
+  --color-primary-400: 129 140 248; /* Indigo */
+  --color-primary-500: 99 102 241;
+  --color-primary-600: 79 70 229;
+  --color-primary-900: 49 46 129;
+}
+
+.theme-dass {
+  --color-primary-400: 239 68 68;   /* Red-500 */
+  --color-primary-500: 226 27 34;   /* Dass Corporate Red #e21b22 */
+  --color-primary-600: 194 22 28;   /* Medium Red */
+  --color-primary-900: 124 45 18;   /* Dark Red */
+}
+
+/* Light mode overrides for Grupo Dass theme */
+:root.theme-dass,
+html:not(.dark) .theme-dass {
+  --color-bg-main: 240 244 249; /* Standard Google Drive light blue-gray background #f0f4f9 */
+  --color-text-main: 15 23 42;  /* Slate-900 */
+}
+
+/* Dark mode overrides for Grupo Dass theme */
+.dark .theme-dass,
+.dark.theme-dass {
+  --color-bg-main: 10 15 26;    /* Deep elegant corporate navy */
+  --color-text-main: 255 255 255;
+}
+
+.theme-industrial {
+  --color-primary-400: 96 165 250;
+  --color-primary-500: 59 130 246;
+  --color-primary-600: 37 99 235;
+  --color-primary-900: 30 58 138;
+}
+
+.theme-teal {
+  --color-primary-400: 45 212 191;
+  --color-primary-500: 20 184 166;
+  --color-primary-600: 13 148 136;
+  --color-primary-900: 19 78 74;
+}
+
+/* Gradient overrides for main backgrounds */
+.theme-ocean .bg-primary-600:not(.bg-opacity-10):not(.bg-opacity-5):not(.bg-opacity-20) {
+  background: linear-gradient(to right, #2563eb, #06b6d4) !important;
+}
+
+.theme-sunset .bg-primary-600:not(.bg-opacity-10):not(.bg-opacity-5):not(.bg-opacity-20) {
+  background: linear-gradient(to right, #e11d48, #f59e0b) !important;
+}
+
+.theme-forest .bg-primary-600:not(.bg-opacity-10):not(.bg-opacity-5):not(.bg-opacity-20) {
+  background: linear-gradient(to right, #059669, #0d9488) !important;
+}
+
+.theme-nebula .bg-primary-600:not(.bg-opacity-10):not(.bg-opacity-5):not(.bg-opacity-20) {
+  background: linear-gradient(to right, #7c3aed, #db2777) !important;
+}
+
+.theme-midnight .bg-primary-600:not(.bg-opacity-10):not(.bg-opacity-5):not(.bg-opacity-20) {
+  background: linear-gradient(to right, #334155, #4f46e5) !important;
+}
+
+/* Estilos auxiliares para o dashboard */
+.glass {
+  background: rgba(15, 23, 42, 0.7);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(30, 41, 59, 0.5);
+}
+
+/* Força o ícone do seletor de data a ser branco com alto contraste conforme imagem de referência */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1) brightness(1.5) contrast(1.2);
+  cursor: pointer;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+}
+
+/* Estilização para o seletor de data nativo no mobile */
+input[type="date"]::-webkit-datetime-edit {
+  padding: 0;
+  color: white;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+input[type="date"]::-webkit-datetime-edit-fields-wrapper {
+  padding: 0;
+}
+
+.auth-input-focus:focus {
+  border-color: #ffffff;
+  box-shadow: 0 0 0 1px #ffffff;
+}
+
+@keyframes neon-pulse-white {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.4), 0 0 20px rgba(255, 255, 255, 0.2), inset 0 0 10px rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.6);
+  }
+  50% {
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.7), 0 0 30px rgba(255, 255, 255, 0.4), inset 0 0 15px rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 1);
+  }
+}
+
+.neon-border-white {
+  animation: neon-pulse-white 2s infinite alternate;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+}
+
+.neon-input-white {
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  transition: all 0.3s ease;
+}
+
+.neon-input-white:focus {
+  animation: neon-pulse-white 2s infinite alternate;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  outline: none;
+}
+
+/* Partículas de fundo (estrelas/poeira) */
+.particles-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.particle {
+  position: absolute;
+  background-color: #ffffff;
+  border-radius: 50%;
+  box-shadow: 0 0 8px 2px rgba(255, 255, 255, 0.6), 0 0 12px 4px rgba(255, 255, 255, 0.2);
+  animation: float-particle linear infinite;
+}
+
+@keyframes float-particle {
+  0% {
+    transform: translateY(0) scale(0.5);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+    transform: translateY(-20px) scale(1);
+  }
+  80% {
+    opacity: 1;
+    transform: translateY(-80px) scale(1);
+  }
+  100% {
+    transform: translateY(-100px) scale(0.5);
+    opacity: 0;
+  }
+}
+
+/* Animações Customizadas para o Auth */
+
+/* Entrar pela direita */
+.slide-in-right {
+  animation: slideInRight 0.5s ease-out forwards;
+}
+
+/* Sair pela esquerda (para quando clicar em voltar) */
+.slide-out-left {
+  animation: slideOutLeft 0.5s ease-in forwards;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOutLeft {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(-100px);
+    opacity: 0;
+  }
+}
+
+/* Ajuste de cor branca para o link solicitado */
+.text-link-white {
+  color: #ffffff !important;
+  font-weight: 900;
+  text-decoration: none;
+}
+
+.text-link-white:hover {
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
+}
+
+.glow-primary {
+  box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
+  transition: all 0.3s ease;
+}
+
+.glow-primary:hover {
+  box-shadow: 0 0 25px rgba(59, 130, 246, 0.6);
+}
