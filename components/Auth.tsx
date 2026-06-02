@@ -91,7 +91,7 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
           if (form.email.toLowerCase() === 'portaldass@grupodass.com' && form.password === '123456') {
              onLogin({
                id: 'DEMO', name: 'Demonstração', email: form.email,
-               role: 'admin', status: 'ativo', allowedViews: ['dashboard', 'history', 'follow-up-pre'], cargo: 'Visitante'
+               role: 'User', status: 'ativo', allowedViews: ['dashboard'], cargo: 'Visitante'
              });
           } else {
             setStatusMsg({ error: 'E-MAIL OU SENHA INCORRETOS', success: '' });
