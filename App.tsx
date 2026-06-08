@@ -129,7 +129,26 @@ const App: React.FC = () => {
     localStorage.removeItem('auth_user');
   };
 
-  const handleNavigate = (view: ViewType) => setCurrentView(view);
+  const handleNavigate = (view: ViewType) => {
+    if (user && user.role !== 'admin') {
+      const allowed = user.allowedViews || [];
+      const email = (user.email || user['E-MAIL'] || '').toLowerCase();
+      const name = (user.name || user.USUÁRIO || '').toLowerCase();
+      const isPortalDass = email.includes('portaldass') || name.includes('portaldass');
+      
+      const extraViews = allowed.filter(v => v !== 'dashboard');
+      const hasNoAuthorizedModules = extraViews.length === 0;
+
+      if (isPortalDass || hasNoAuthorizedModules) {
+        setCurrentView('dashboard');
+        return;
+      } else if (view !== 'dashboard' && !allowed.includes(view)) {
+        setCurrentView('dashboard');
+        return;
+      }
+    }
+    setCurrentView(view);
+  };
 
   const handleUserUpdate = (updatedUser: User) => {
     setUser(updatedUser);
@@ -160,7 +179,24 @@ const App: React.FC = () => {
   if (!user) return <Auth onLogin={handleLogin} />;
 
   const renderContent = () => {
-    switch (currentView) {
+    let authorizedView = currentView;
+    if (user && user.role !== 'admin') {
+      const allowed = user.allowedViews || [];
+      const email = (user.email || user['E-MAIL'] || '').toLowerCase();
+      const name = (user.name || user.USUÁRIO || '').toLowerCase();
+      const isPortalDass = email.includes('portaldass') || name.includes('portaldass');
+      
+      const extraViews = allowed.filter(v => v !== 'dashboard');
+      const hasNoAuthorizedModules = extraViews.length === 0;
+
+      if (isPortalDass || hasNoAuthorizedModules) {
+        authorizedView = 'dashboard';
+      } else if (currentView !== 'dashboard' && !allowed.includes(currentView)) {
+        authorizedView = 'dashboard';
+      }
+    }
+
+    switch (authorizedView) {
       case 'dashboard':
         return <Dashboard filters={filters} theme={theme} />;
       case 'chat':

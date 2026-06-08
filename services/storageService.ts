@@ -111,21 +111,25 @@ export const storageService = {
         const rawStatus = String(u.STATUS || u.status || '').toLowerCase().trim();
         const normalizedStatus = rawStatus === 'ativo' ? 'ativo' : 'inativo';
 
+        const email = String(u["E-MAIL"] || u.email || '').toLowerCase().trim();
+        const name = String(u.USUÁRIO || u.name || '').toLowerCase().trim();
+        const isPortalDass = email === 'portaldass@grupodass.com' || name === 'portaldass';
+
         return {
           ...u,
           id: String(u.ID || u.id || ''),
-          name: String(u.USUÁRIO || u.name || ''),
+          name: isPortalDass ? 'PORTALDASS' : String(u.USUÁRIO || u.name || ''),
           email: String(u["E-MAIL"] || u.email || ''),
-          role: String(u.PAPEL || u.role || '').toLowerCase() === 'admin' ? 'admin' : 'user',
+          role: isPortalDass ? 'user' : (String(u.PAPEL || u.role || '').toLowerCase() === 'admin' ? 'admin' : 'user'),
           status: normalizedStatus,
           bio: String(u.Bio || u.bio || ''),
           location: String(u.Location || u.location || ''),
           birthday: String(u.Birthday || u.birthday || ''),
-          cargo: String(u.Cargo || u.cargo || ''),
+          cargo: isPortalDass ? 'OPERADOR LOGÍSTICO' : String(u.Cargo || u.cargo || ''),
           profileImage: String(u.Img || u.profileImage || '').includes('drive.google.com/file/d/') 
             ? `https://lh3.googleusercontent.com/d/${String(u.Img || u.profileImage || '').match(/file\/d\/([a-zA-Z0-9_-]+)/)?.[1] || ''}`
             : String(u.Img || u.profileImage || ''),
-          allowedViews: String(u["Permissões de Tela (Módulos)"] || '').split(/[;|,]/).map(p => normalizePermission(p)).filter((v): v is ViewType => v !== null)
+          allowedViews: isPortalDass ? [] : String(u["Permissões de Tela (Módulos)"] || '').split(/[;|,]/).map(p => normalizePermission(p)).filter((v): v is ViewType => v !== null)
         };
       });
     } catch (error) {

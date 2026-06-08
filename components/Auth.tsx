@@ -90,8 +90,8 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
           // Fallback para o acesso demonstrativo manual (mesmo se a planilha falhar)
           if (form.email.toLowerCase() === 'portaldass@grupodass.com' && form.password === '123456') {
              onLogin({
-               id: 'DEMO', name: 'Demonstração', email: form.email,
-               role: 'admin', status: 'ativo', allowedViews: ['dashboard', 'history', 'follow-up-pre'], cargo: 'Visitante'
+               id: 'DEMO', name: 'PORTALDASS', email: form.email,
+               role: 'user', status: 'ativo', allowedViews: [], cargo: 'OPERADOR LOGÍSTICO'
              });
           } else {
             setStatusMsg({ error: 'E-MAIL OU SENHA INCORRETOS', success: '' });

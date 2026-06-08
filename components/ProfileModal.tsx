@@ -36,6 +36,13 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose, user, onNa
     setIsEditModalOpen(false);
   };
 
+  const userEmail = (user.email || user['E-MAIL'] || '').toLowerCase();
+  const userName = (user.name || user.USUÁRIO || '').toLowerCase();
+  const isPortalDass = userEmail.includes('portaldass') || userName.includes('portaldass');
+  const extraViews = (user.allowedViews || []).filter(v => v !== 'dashboard');
+  const hasNoAuthorizedModules = user.role !== 'admin' && extraViews.length === 0;
+  const isRestricted = isPortalDass || hasNoAuthorizedModules;
+
   return (
     <>
       <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 md:p-10 bg-black/95 backdrop-blur-xl animate-in fade-in duration-300">
@@ -65,7 +72,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose, user, onNa
              </div>
              
              <div className="mt-10 text-center z-10">
-                 <h2 className="text-4xl font-[900] text-custom-main tracking-tighter uppercase italic">{handleName}</h2>
+                  <h2 className="text-4xl font-[900] text-custom-main tracking-tighter uppercase italic">{handleName}</h2>
                 <div className="flex items-center justify-center gap-2 mt-2">
                   <div className="w-2 h-2 bg-emerald-500 rounded-full shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
                   {/* Troca de OPERADOR por Cargo Dinâmico conforme solicitado */}
@@ -129,20 +136,22 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose, user, onNa
              </div>
 
              {/* Footer Buttons conforme Imagem */}
-             <div className="mt-12 flex gap-6">
-                <button 
-                  onClick={handleMessageClick}
-                  className="flex-1 bg-primary-600 hover:bg-primary-500 text-white font-black text-xs uppercase tracking-[0.2em] py-6 rounded-[28px] shadow-2xl shadow-primary-600/20 transition-all flex items-center justify-center gap-3 active:scale-95"
-                >
-                  <MessageSquare size={18} strokeWidth={3} /> Iniciar Conversa
-                </button>
-                <button 
-                  onClick={() => setIsEditModalOpen(true)}
-                  className="flex-1 bg-slate-100 dark:bg-slate-800 hover:bg-slate-700 text-slate-900 dark:text-white font-black text-xs uppercase tracking-[0.2em] py-6 rounded-[28px] transition-all flex items-center justify-center gap-3 active:scale-95 border border-slate-200 dark:border-white/5"
-                >
-                  <Edit3 size={18} strokeWidth={3} /> Editar Perfil
-                </button>
-             </div>
+             {!isRestricted && (
+                <div className="mt-12 flex gap-6">
+                   <button 
+                     onClick={handleMessageClick}
+                     className="flex-1 bg-primary-600 hover:bg-primary-500 text-white font-black text-xs uppercase tracking-[0.2em] py-6 rounded-[28px] shadow-2xl shadow-primary-600/20 transition-all flex items-center justify-center gap-3 active:scale-95"
+                   >
+                     <MessageSquare size={18} strokeWidth={3} /> Iniciar Conversa
+                   </button>
+                   <button 
+                     onClick={() => setIsEditModalOpen(true)}
+                     className="flex-1 bg-slate-100 dark:bg-slate-800 hover:bg-slate-700 text-slate-900 dark:text-white font-[900] text-xs uppercase tracking-[0.2em] py-6 rounded-[28px] transition-all flex items-center justify-center gap-3 active:scale-95 border border-slate-200 dark:border-white/5"
+                   >
+                     <Edit3 size={18} strokeWidth={3} /> Editar Perfil
+                   </button>
+                </div>
+             )}
 
           </div>
         </div>
