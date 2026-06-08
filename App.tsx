@@ -18,7 +18,7 @@ const App: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
   const [isInitializing, setIsInitializing] = useState(true);
   const [currentView, setCurrentView] = useState<ViewType>('dashboard');
-  const [theme, setTheme] = useState<'dark' | 'light'>('light');
+  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
   const [colorTheme, setColorTheme] = useState<string>('theme-dass');
   const [isThemeSettingsOpen, setIsThemeSettingsOpen] = useState(false);
   const [usersList, setUsersList] = useState<User[]>([]);
@@ -65,7 +65,7 @@ const App: React.FC = () => {
           }
         }
         
-        setTheme(savedTheme || 'light');
+        setTheme(savedTheme || 'dark');
         if (savedColorTheme) {
           setColorTheme(savedColorTheme);
           if (savedColorTheme === 'theme-custom') {
