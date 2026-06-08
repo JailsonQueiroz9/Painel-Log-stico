@@ -131,13 +131,13 @@ const FollowUp: React.FC<FollowUpProps> = ({ filters, isPreMode = false, theme =
         </div>
       </header>
 
-      <main className="flex-1 overflow-auto p-10 custom-scrollbar">
+      <main className="flex-1 overflow-y-auto overflow-x-hidden p-10 custom-scrollbar">
         {loading && records.length === 0 ? (
           <div className="h-full flex items-center justify-center">
              <Loader2 size={40} className="text-primary-500 animate-spin" />
           </div>
         ) : viewMode === 'table' ? (
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto custom-scrollbar pb-4">
             <table className="w-full text-left border-separate border-spacing-y-4 min-w-[1000px]">
               <thead>
                 <tr className="text-[9px] uppercase tracking-[0.2em] text-slate-500 font-black">
@@ -168,7 +168,6 @@ const FollowUp: React.FC<FollowUpProps> = ({ filters, isPreMode = false, theme =
                            <FileText size={18} />
                            {pdfs.length > 0 && <span className="absolute -top-1 -right-1 w-4 h-4 bg-emerald-500 text-slate-900 dark:text-white text-[8px] font-black flex items-center justify-center rounded-full border border-[#050a14]">{pdfs.length}</span>}
                         </button>
-                        {openDocsId === (r.id || r.ID) && <DocumentDropdown links={pdfs} onClose={() => setOpenDocsId(null)} />}
                       </td>
                       <td className="px-4 py-6 rounded-r-[24px] text-right">
                         {hasPermission && (
@@ -197,7 +196,6 @@ const FollowUp: React.FC<FollowUpProps> = ({ filters, isPreMode = false, theme =
                     {pdfs.length > 0 && (
                       <div className="relative">
                         <button onClick={() => setOpenDocsId(openDocsId === (r.id || r.ID) ? null : (r.id || r.ID))} className="p-2.5 rounded-xl border border-emerald-500/20 bg-emerald-600/10 text-emerald-500 hover:bg-emerald-600 hover:text-white transition-all"><FileCheck size={16} /></button>
-                        {openDocsId === (r.id || r.ID) && <DocumentDropdown links={pdfs} onClose={() => setOpenDocsId(null)} isRight />}
                       </div>
                     )}
                     {hasPermission && (
@@ -251,29 +249,87 @@ const FollowUp: React.FC<FollowUpProps> = ({ filters, isPreMode = false, theme =
       </main>
 
       <AWBModal isOpen={isModalOpen} onClose={() => { setIsModalOpen(false); setEditingRecord(undefined); }} onSave={loadData} editingRecord={editingRecord} isNFMode={isPreMode} theme={theme} />
-      {openDocsId && <div className="fixed inset-0 z-[60]" onClick={() => setOpenDocsId(null)} />}
+      {openDocsId && (() => {
+        const selected = records.find(r => (r.id || r.ID) === openDocsId);
+        if (!selected) return null;
+        const pdfLinks = getAttachmentLinks(selected);
+        return <DocumentModal links={pdfLinks} onClose={() => setOpenDocsId(null)} record={selected} theme={theme} />;
+      })()}
     </div>
   );
 };
 
-const DocumentDropdown = ({ links, onClose, isRight = false }: { links: string[], onClose: () => void, isRight?: boolean }) => (
-  <div className={`absolute ${isRight ? 'right-0' : 'left-0'} top-full mt-2 w-72 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl z-[100] animate-in fade-in slide-in-from-top-2 pointer-events-auto`}>
-    <div className="p-4 bg-emerald-600/5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between rounded-t-2xl">
-      <span className="text-[9px] font-black text-emerald-500 uppercase tracking-widest">Anexos Vinculados ({links.length})</span>
-      <button onClick={onClose} className="text-slate-600 hover:text-slate-900 dark:text-white"><X size={12}/></button>
-    </div>
-    <div className="p-2 max-h-72 overflow-y-auto custom-scrollbar bg-white dark:bg-slate-900 rounded-b-2xl">
-      {links.map((url, i) => (
-        <a key={i} href={url} target="_blank" rel="noreferrer" className="flex items-center gap-3 p-3 hover:bg-white/5 rounded-xl transition-all group">
-          <div className="p-2 bg-white dark:bg-slate-900 rounded-lg text-slate-600 group-hover:text-emerald-500 transition-colors"><Download size={14} /></div>
-          <div className="flex-1 min-w-0">
-            <p className="text-[10px] font-black text-slate-900 dark:text-white uppercase truncate">Documento PDF {i + 1}</p>
-            <p className="text-[8px] text-slate-600 font-bold truncate">Download Cloud</p>
+const DocumentModal = ({ 
+  links, 
+  onClose, 
+  record, 
+  theme = 'dark' 
+}: { 
+  links: string[], 
+  onClose: () => void, 
+  record: AWBRecord, 
+  theme?: 'dark' | 'light' 
+}) => {
+  const awb = record.AWB || record.awbNumber || record["NF's"] || record.nfs || '-';
+  const supplier = record.Fornecedor || record.fornecedor || '-';
+
+  return (
+    <div className="fixed inset-0 z-[250] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md overflow-hidden">
+      <div className="bg-custom-main w-full max-w-lg rounded-[24px] border border-slate-200 dark:border-white/10 shadow-2xl flex flex-col max-h-[85vh] overflow-hidden animate-in zoom-in-95 duration-200 text-custom-main">
+        
+        <div className="px-8 py-6 flex items-center justify-between border-b border-slate-200 dark:border-white/5 shrink-0">
+          <div className="space-y-1">
+             <h2 className="text-xl font-black text-custom-main italic tracking-tighter uppercase">
+               Documentação Digital
+             </h2>
+             <p className="text-[9px] font-black tracking-widest text-[#10b981] uppercase flex items-center gap-1.5">
+               <FileText size={12} /> {awb} • {supplier}
+             </p>
           </div>
-        </a>
-      ))}
+          <button onClick={onClose} className="p-2.5 bg-white/5 hover:bg-white/10 rounded-xl text-slate-500 hover:text-slate-900 dark:text-white transition-all border border-slate-200 dark:border-white/10">
+            <X size={16} />
+          </button>
+        </div>
+
+        <div className="p-6 overflow-y-auto custom-scrollbar space-y-4 flex-1">
+          <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">
+            Anexos vinculados a esta operação ({links.length})
+          </p>
+          
+          <div className="space-y-3">
+            {links.map((url, i) => (
+              <a 
+                key={i} 
+                href={url} 
+                target="_blank" 
+                rel="noreferrer" 
+                className="flex items-center gap-4 p-4 bg-white/5 border border-slate-200 dark:border-white/5 hover:border-[#10b981]/30 hover:bg-[#10b981]/5 rounded-2xl transition-all group"
+              >
+                <div className="p-3 bg-white dark:bg-slate-900 rounded-xl text-slate-600 dark:text-slate-400 group-hover:text-[#10b981] group-hover:bg-[#10b981]/10 border border-slate-200 dark:border-slate-800 transition-colors">
+                  <Download size={18} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[11px] font-black text-slate-900 dark:text-white uppercase tracking-wider truncate">Documento PDF {i + 1}</p>
+                  <p className="text-[9px] text-slate-500 font-bold tracking-widest uppercase truncate mt-1">Download Seguro • Cloud Storage</p>
+                </div>
+                <ChevronRight size={18} className="text-slate-800 group-hover:text-[#10b981] group-hover:translate-x-1 transition-all" />
+              </a>
+            ))}
+          </div>
+        </div>
+
+        <div className="px-8 py-5 border-t border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-slate-950/20 flex justify-end shrink-0">
+          <button 
+            type="button" 
+            onClick={onClose} 
+            className="px-6 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-[10px] font-black text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white rounded-xl transition-all uppercase tracking-widest shadow-sm"
+          >
+            Fechar
+          </button>
+        </div>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 export default FollowUp;

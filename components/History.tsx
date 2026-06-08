@@ -2,7 +2,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { 
   History as HistoryIcon, Search, Calendar, Filter, 
-  ChevronDown, FileText, CheckCircle2, Loader2, Download, ExternalLink, RefreshCw
+  ChevronDown, FileText, CheckCircle2, Loader2, Download, ExternalLink, RefreshCw,
+  ChevronRight, X
 } from 'lucide-react';
 import { AWBRecord, AWBStatus } from '../types';
 import { storageService, formatDate } from '../services/storageService';
@@ -161,33 +162,6 @@ const History: React.FC<HistoryProps> = ({ theme = 'dark' }) => {
                         >
                            <FileText size={18} />
                         </button>
-
-                        {openDocsId === (r.id || r.ID) && docs.length > 0 && (
-                          <div className="absolute right-0 top-full mt-4 w-64 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] z-50 overflow-hidden animate-in fade-in slide-in-from-top-2">
-                             <div className="p-4 border-b border-slate-200 dark:border-slate-800 bg-emerald-600/5">
-                                <p className="text-[9px] font-black uppercase tracking-[0.2em] text-emerald-500 flex items-center gap-2">
-                                   <FileText size={10} /> Documentos em Anexo ({docs.length})
-                                </p>
-                             </div>
-                             <div className="max-h-64 overflow-y-auto custom-scrollbar p-2 space-y-1">
-                                {docs.map((url: string, idx: number) => (
-                                  <button 
-                                    key={idx}
-                                    onClick={() => window.open(url, '_blank')}
-                                    className="w-full flex items-center gap-3 p-3 hover:bg-white/5 rounded-xl transition-all text-left group"
-                                  >
-                                    <div className="p-2 bg-white dark:bg-slate-900 rounded-lg text-slate-600 group-hover:text-emerald-500 transition-colors">
-                                      <Download size={14} />
-                                    </div>
-                                    <div className="flex flex-col min-w-0">
-                                      <span className="text-[9px] font-black text-slate-900 dark:text-white uppercase truncate">PDF ARQUIVO {idx + 1}</span>
-                                      <span className="text-[7px] text-slate-600 font-bold truncate">{url.split('/').pop()?.substring(0, 25)}...</span>
-                                    </div>
-                                  </button>
-                                ))}
-                             </div>
-                          </div>
-                        )}
                      </div>
                   </div>
                 </div>
@@ -197,10 +171,86 @@ const History: React.FC<HistoryProps> = ({ theme = 'dark' }) => {
         )}
       </main>
 
-      {openDocsId && (
-        <div className="fixed inset-0 z-40" onClick={() => setOpenDocsId(null)} />
-      )}
+      {openDocsId && (() => {
+        const selected = records.find(r => (r.id || r.ID) === openDocsId);
+        if (!selected) return null;
+        const pdfLinks = selected.pdf_links || (selected.documentos || selected.Documentos ? String(selected.documentos || selected.Documentos).split('|').filter(l => l.trim().startsWith('http')) : []);
+        return <DocumentModal links={pdfLinks} onClose={() => setOpenDocsId(null)} record={selected} theme={theme} />;
+      })()}
 
+    </div>
+  );
+};
+
+const DocumentModal = ({ 
+  links, 
+  onClose, 
+  record, 
+  theme = 'dark' 
+}: { 
+  links: string[], 
+  onClose: () => void, 
+  record: AWBRecord, 
+  theme?: 'dark' | 'light' 
+}) => {
+  const awb = record.AWB || record.awbNumber || record["NF's"] || record.nfs || '-';
+  const supplier = record.Fornecedor || record.fornecedor || '-';
+
+  return (
+    <div className="fixed inset-0 z-[250] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md overflow-hidden animate-in fade-in duration-200">
+      <div className="bg-custom-main w-full max-w-lg rounded-[24px] border border-slate-200 dark:border-white/10 shadow-2xl flex flex-col max-h-[85vh] overflow-hidden animate-in zoom-in-95 duration-200 text-custom-main">
+        
+        <div className="px-8 py-6 flex items-center justify-between border-b border-slate-200 dark:border-white/5 shrink-0">
+          <div className="space-y-1">
+             <h2 className="text-xl font-black text-custom-main italic tracking-tighter uppercase">
+               Documentação Digital
+             </h2>
+             <p className="text-[9px] font-black tracking-widest text-[#10b981] uppercase flex items-center gap-1.5">
+               <FileText size={12} /> {awb} • {supplier}
+             </p>
+          </div>
+          <button onClick={onClose} className="p-2.5 bg-white/5 hover:bg-white/10 rounded-xl text-slate-500 hover:text-slate-900 dark:text-white transition-all border border-slate-200 dark:border-white/10">
+            <X size={16} />
+          </button>
+        </div>
+
+        <div className="p-6 overflow-y-auto custom-scrollbar space-y-4 flex-1">
+          <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">
+            Anexos vinculados a esta operação ({links.length})
+          </p>
+          
+          <div className="space-y-3">
+            {links.map((url, i) => (
+              <a 
+                key={i} 
+                href={url} 
+                target="_blank" 
+                rel="noreferrer" 
+                className="flex items-center gap-4 p-4 bg-white/5 border border-slate-200 dark:border-white/5 hover:border-[#10b981]/30 hover:bg-[#10b981]/5 rounded-2xl transition-all group"
+              >
+                <div className="p-3 bg-white dark:bg-slate-900 rounded-xl text-slate-600 dark:text-slate-400 group-hover:text-[#10b981] group-hover:bg-[#10b981]/10 border border-slate-200 dark:border-slate-800 transition-colors">
+                  <Download size={18} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[11px] font-black text-slate-900 dark:text-white uppercase tracking-wider truncate">Documento PDF {i + 1}</p>
+                  <p className="text-[9px] text-slate-500 font-bold tracking-widest uppercase truncate mt-1">Download Seguro • Cloud Storage</p>
+                </div>
+                <ChevronRight size={18} className="text-slate-800 group-hover:text-[#10b981] group-hover:translate-x-1 transition-all" />
+              </a>
+            ))}
+          </div>
+        </div>
+
+        <div className="px-8 py-5 border-t border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-slate-950/20 flex justify-end shrink-0">
+          <button 
+            type="button" 
+            onClick={onClose} 
+            className="px-6 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-[10px] font-black text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white rounded-xl transition-all uppercase tracking-widest shadow-sm"
+          >
+            Fechar
+          </button>
+        </div>
+      </div>
     </div>
   );
 };
