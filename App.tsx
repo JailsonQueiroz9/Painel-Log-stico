@@ -12,7 +12,7 @@ import ThemeSettings from './components/ThemeSettings';
 import GmailCenter from './components/GmailCenter';
 import { User, ViewType, FilterState } from './types';
 import { storageService } from './services/storageService';
-import { AlertCircle, X, RefreshCw } from 'lucide-react';
+import { AlertCircle, X, RefreshCw, ShieldAlert } from 'lucide-react';
 
 const App: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -23,6 +23,8 @@ const App: React.FC = () => {
   const [isThemeSettingsOpen, setIsThemeSettingsOpen] = useState(false);
   const [usersList, setUsersList] = useState<User[]>([]);
   const [globalError, setGlobalError] = useState<string | null>(null);
+  const [showPendingAlert, setShowPendingAlert] = useState(true);
+  const [lastPendingCount, setLastPendingCount] = useState(0);
   const [filters, setFilters] = useState<FilterState>({
     statuses: [],
     period: 'todos'
@@ -117,6 +119,35 @@ const App: React.FC = () => {
       document.documentElement.classList.remove('dark');
     }
   }, [theme]);
+
+  const pendingUsersCount = user?.role === 'admin' 
+    ? usersList.filter(u => String(u.status || u.STATUS || '').toLowerCase().trim() === 'inativo').length 
+    : 0;
+
+  useEffect(() => {
+    if (pendingUsersCount > lastPendingCount) {
+      setShowPendingAlert(true);
+    }
+    setLastPendingCount(pendingUsersCount);
+  }, [pendingUsersCount]);
+
+  useEffect(() => {
+    if (!user || user.role !== 'admin') return;
+
+    const interval = setInterval(async () => {
+      try {
+        const cloudUsers = await storageService.getUsers();
+        if (cloudUsers.length > 0) {
+          setUsersList(cloudUsers);
+          localStorage.setItem('app_users', JSON.stringify(cloudUsers));
+        }
+      } catch (err) {
+        console.warn("Erro de background na busca de novos operadores:", err);
+      }
+    }, 20000);
+
+    return () => clearInterval(interval);
+  }, [user]);
 
   const handleLogin = (userData: User) => {
     setUser(userData);
@@ -254,8 +285,40 @@ const App: React.FC = () => {
         onChangeColorTheme={handleChangeColorTheme}
         onUserUpdate={handleUserUpdate}
         onOpenThemeSettings={() => setIsThemeSettingsOpen(true)}
+        pendingUsersCount={pendingUsersCount}
       />
       {renderContent()}
+
+      {/* Alerta flutuante de novo usuário para Administrador */}
+      {user && user.role === 'admin' && pendingUsersCount > 0 && currentView !== 'users' && showPendingAlert && (
+        <div className="fixed bottom-6 right-6 z-50 max-w-sm rounded-[32px] border border-rose-500/30 bg-white dark:bg-slate-900 p-6 shadow-2xl shadow-rose-950/10 backdrop-blur-md animate-in slide-in-from-bottom-5 duration-300">
+          <div className="flex items-start gap-4">
+            <div className="p-3 bg-rose-500/10 text-rose-500 rounded-2xl border border-rose-500/20 shrink-0">
+              <ShieldAlert size={20} className="animate-pulse" />
+            </div>
+            <div className="flex-1 space-y-1">
+              <h4 className="text-[11px] font-black text-rose-500 uppercase tracking-widest italic">Acesso Pendente</h4>
+              <p className="text-[10px] text-slate-500 dark:text-slate-400 font-extrabold uppercase leading-snug">
+                Há {pendingUsersCount} {pendingUsersCount === 1 ? 'operador aguardando' : 'operadores aguardando'} liberação de acesso ao sistema.
+              </p>
+              <div className="flex items-center gap-2 pt-3">
+                <button 
+                  onClick={() => handleNavigate('users')} 
+                  className="px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white rounded-xl text-[8px] font-black uppercase tracking-widest transition-all shadow-md active:scale-95 animate-pulse"
+                >
+                  Liberar Acesso
+                </button>
+                <button 
+                  onClick={() => setShowPendingAlert(false)} 
+                  className="px-3 py-2 bg-transparent hover:bg-slate-100 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white rounded-xl text-[8px] font-black uppercase tracking-widest transition-all"
+                >
+                  Depois
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       <ThemeSettings 
         isOpen={isThemeSettingsOpen}

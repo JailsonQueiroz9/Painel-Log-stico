@@ -34,10 +34,11 @@ interface SidebarProps {
   onChangeColorTheme: (theme: string) => void;
   onUserUpdate?: (updatedUser: User) => void;
   onOpenThemeSettings: () => void;
+  pendingUsersCount?: number;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ 
-  user, onLogout, currentView, onNavigate, filters, onFilterChange, theme, onToggleTheme, colorTheme, onChangeColorTheme, onUserUpdate, onOpenThemeSettings
+  user, onLogout, currentView, onNavigate, filters, onFilterChange, theme, onToggleTheme, colorTheme, onChangeColorTheme, onUserUpdate, onOpenThemeSettings, pendingUsersCount = 0
 }) => {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -106,7 +107,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             <button
               key={idx}
               onClick={() => { onNavigate(item.view); setMobileOpen(false); }}
-              className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all group ${
+              className={`relative w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all group ${
                 currentView === item.view 
                   ? 'bg-primary-600 text-white shadow-xl shadow-primary-900/10' 
                   : `text-custom-main opacity-70 hover:opacity-100 ${theme === 'light' ? 'hover:bg-blue-50/50' : 'hover:bg-white/10'}`
@@ -115,6 +116,15 @@ const Sidebar: React.FC<SidebarProps> = ({
               <item.icon size={18} className={`${currentView === item.view ? 'text-white' : `text-custom-main ${theme === 'light' ? 'opacity-80' : 'opacity-60'} group-hover:opacity-100 group-hover:text-primary-500`}`} />
               {(!collapsed || mobileOpen) && (
                 <span className="text-[10px] font-black uppercase tracking-widest">{item.label}</span>
+              )}
+              {item.view === 'users' && pendingUsersCount > 0 && (
+                <span className={`ml-auto flex items-center justify-center rounded-full bg-rose-600 text-[9px] font-black tracking-normal text-white animate-pulse ${
+                  collapsed && !mobileOpen 
+                    ? 'absolute top-1.5 right-1.5 w-2.5 h-2.5' 
+                    : 'w-5 h-5 px-1 py-0.5'
+                }`}>
+                  {collapsed && !mobileOpen ? '' : pendingUsersCount}
+                </span>
               )}
             </button>
           ))}

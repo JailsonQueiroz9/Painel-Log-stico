@@ -59,13 +59,13 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
           "E-MAIL": form.email.trim().toLowerCase(),
           SENHA: form.password,
           PAPEL: 'User',
-          STATUS: 'ativo',
+          STATUS: 'inativo',
           Cargo: form.cargo.trim().toUpperCase(),
         };
 
         await storageService.saveUser(payload);
-        setStatusMsg({ error: '', success: 'CADASTRO REALIZADO! VOLTANDO AO LOGIN...' });
-        setTimeout(() => setIsRegistering(false), 2000);
+        setStatusMsg({ error: '', success: 'SOLICITAÇÃO REALIZADA! AGUARDE A LIBERAÇÃO DO ADMINISTRADOR PARA ACESSAR.' });
+        setTimeout(() => setIsRegistering(false), 4000);
 
       } else {
         // Lógica de Login CORRIGIDA
